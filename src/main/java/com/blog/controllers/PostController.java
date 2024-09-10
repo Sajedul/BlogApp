@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.blog.config.AppConstants;
 import com.blog.payloads.ApiResponse;
 import com.blog.payloads.PostDto;
+import com.blog.payloads.PostResponse;
 import com.blog.services.PostService;
 
 @RestController
@@ -58,11 +61,19 @@ public class PostController {
 			
 		}
 		
-		//get all post
+		//get all post without response attribute
+		//ResponseEntity<List<PostDto>> getAllPost(@RequestParam(value="pageNumber", defaultValue="0",required = false)Integer pageNumber,@RequestParam(value="pageSize",defaultValue="5",required = false)Integer pageSize)
+		
+		//get All post with response entity
 		@GetMapping("/allpost")
-		public ResponseEntity<List<PostDto>> getAllPost() {
-			List<PostDto>allPost = this.postService.getAllPost();
-			return new ResponseEntity<List<PostDto>>(allPost,HttpStatus.OK);
+		public ResponseEntity<PostResponse> getAllPost(@RequestParam(value="pageNumber", defaultValue=AppConstants.PAGE_NUMBER,required = false)Integer pageNumber,
+				                                        @RequestParam(value="pageSize",defaultValue=AppConstants.PAGE_SIZE,required = false)Integer pageSize,
+				                                        @RequestParam(value="sortBy",defaultValue=AppConstants.SORT_BY,required=false)String sortBy,
+				                                        @RequestParam(value="sortDirectio",defaultValue=AppConstants.SORT_DIRECTION,required=false)String sortDirection) {
+			PostResponse allPostWithResponse = this.postService.getAllPost(pageNumber,pageSize,sortBy,sortDirection);
+			
+			
+			return new ResponseEntity<PostResponse>(allPostWithResponse,HttpStatus.OK);
 		}
 		
 		//get post details by id
@@ -89,4 +100,12 @@ public class PostController {
 			return new ResponseEntity<PostDto>(updatePost,HttpStatus.OK);
 			
 		}
+		
+		//search handler
+		@GetMapping("/posts/search/{keywords}")
+		public ResponseEntity<List<PostDto>> searchPostByTitle(@PathVariable("keywords")String keywords) {
+			List<PostDto>result= this.postService.searchPosts(keywords);
+			return new ResponseEntity<List<PostDto>>(result,HttpStatus.OK);
+		}
+		
 }
