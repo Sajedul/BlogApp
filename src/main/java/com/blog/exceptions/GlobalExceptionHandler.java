@@ -24,6 +24,14 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.NOT_FOUND);
 	}
 	
+	@ExceptionHandler(EmailResourceNotFoundException.class)
+	public ResponseEntity<ApiResponse> emailResourceNotFoundExceptionHandler(ResourceNotFoundException e) {
+		
+		String message = e.getMessage();
+		ApiResponse apiResponse= new ApiResponse(message,false);
+		return new ResponseEntity<ApiResponse>(apiResponse,HttpStatus.NOT_FOUND);
+	}
+	
 	//The method returns a ResponseEntity containing a Map.
 	//where the keys are field names and the values are the corresponding validation error messages.
 	
