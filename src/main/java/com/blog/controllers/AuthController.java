@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.blog.payloads.JwtAuthRequest;
 import com.blog.payloads.JwtAuthResponse;
+import com.blog.payloads.UserDto;
 import com.blog.security.JwtTokenHelper;
+import com.blog.services.UserService;
 
 @RestController
 @RequestMapping("/api/v1/auth/")
@@ -27,6 +29,8 @@ public class AuthController {
 	private UserDetailsService userDetailsService;
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	@Autowired
+	private UserService userService;
 	
 	@PostMapping("/login")
 	public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) {
@@ -37,9 +41,16 @@ public class AuthController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUserName());
         String token = this.jwtTokenHelper.generateToken(userDetails);
 
-        JwtAuthResponse response =new JwtAuthResponse();
-                response.setJwtToken(token);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+		
+		JwtAuthResponse response = new JwtAuthResponse();
+		response.setJwtToken(token);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+        
+		/*
+		 * JwtAuthResponse response = JwtAuthResponse.builder() .jwtToken(token)
+		 * .username(userDetails.getUsername()).build(); return new
+		 * ResponseEntity<>(response, HttpStatus.OK);
+		 */
 		
 	}
 	
@@ -59,6 +70,12 @@ public class AuthController {
     @ExceptionHandler(BadCredentialsException.class)
     public String exceptionHandler() {
         return "Credentials Invalid !!";
+    }
+    
+    @PostMapping("/register")
+    public ResponseEntity<UserDto>registerUser(@RequestBody UserDto userDto){
+    	UserDto registedUser = this.userService.registerNewUser(userDto);
+    	return new ResponseEntity<UserDto>(registedUser,HttpStatus.CREATED);
     }
 
 }
