@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(EmailResourceNotFoundException.class)
-	public ResponseEntity<ApiResponse> emailResourceNotFoundExceptionHandler(ResourceNotFoundException e) {
+	public ResponseEntity<ApiResponse> emailResourceNotFoundExceptionHandler(EmailResourceNotFoundException e) {
 		
 		String message = e.getMessage();
 		ApiResponse apiResponse= new ApiResponse(message,false);

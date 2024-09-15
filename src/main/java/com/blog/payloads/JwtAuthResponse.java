@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @Data
 public class JwtAuthResponse {
-	private String jwtToken;
-	private String username;
+	private String token;
+	//private String username;
 }

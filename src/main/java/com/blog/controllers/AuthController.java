@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,20 +32,22 @@ public class AuthController {
 	private AuthenticationManager authenticationManager;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	@PostMapping("/login")
 	public ResponseEntity<JwtAuthResponse> createToken(@RequestBody JwtAuthRequest request) {
 		
-		this.doAuthenticate(request.getUserName(), request.getPassword());
+		this.doAuthenticate(request.getUsername(), request.getPassword());
 
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUserName());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
         String token = this.jwtTokenHelper.generateToken(userDetails);
 
 		
 		JwtAuthResponse response = new JwtAuthResponse();
-		response.setJwtToken(token);
-		return new ResponseEntity<>(response, HttpStatus.OK);
+		response.setToken(token);
+		return new ResponseEntity<JwtAuthResponse>(response, HttpStatus.OK);
         
 		/*
 		 * JwtAuthResponse response = JwtAuthResponse.builder() .jwtToken(token)
@@ -54,9 +57,9 @@ public class AuthController {
 		
 	}
 	
-	private void doAuthenticate(String email, String password) {
+	private void doAuthenticate(String username, String password) {
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         try {
         	authenticationManager.authenticate(authenticationToken);
 
@@ -74,7 +77,10 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<UserDto>registerUser(@RequestBody UserDto userDto){
+    	
+    	userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
     	UserDto registedUser = this.userService.registerNewUser(userDto);
+    	
     	return new ResponseEntity<UserDto>(registedUser,HttpStatus.CREATED);
     }
 
