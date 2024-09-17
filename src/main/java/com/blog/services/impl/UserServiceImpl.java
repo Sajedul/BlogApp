@@ -1,5 +1,6 @@
 package com.blog.services.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,13 +124,27 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public UserDto registerNewUser(UserDto userDto) {
 		
-		User user = this.modelMapper.map(userDto, User.class);
-		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-		
-		Role role = this.roleRepo.findById(AppConstants.NORMAl_USER).get();
-		user.getRoles().add(role);
-		User newUser = this.userRepo.save(user);
-		return this.modelMapper.map(newUser, UserDto.class);
+		  // Map UserDto to User entity
+	    User user = this.modelMapper.map(userDto, User.class);
+
+	    // Encode password before saving to the database
+	    user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+
+	    // Fetch the role and handle possible errors if the role is not found
+	    Role role = this.roleRepo.findById(AppConstants.NORMAl_USER)
+	        .orElseThrow(() -> new ResourceNotFoundException("Role", "ID", AppConstants.NORMAl_USER));
+
+	    // Initialize roles if null and add the fetched role
+	    if (user.getRoles() == null) {
+	        user.setRoles(new HashSet<>());
+	    }
+	    user.getRoles().add(role);
+
+	    // Save the user to the database
+	    User newUser = this.userRepo.save(user);
+
+	    // Return the mapped UserDto
+	    return this.modelMapper.map(newUser, UserDto.class);
 	}
 
 }

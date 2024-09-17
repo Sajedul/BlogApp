@@ -23,6 +23,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,7 @@ public class User implements UserDetails{
 	@Column(name="user_name",nullable=false,length=100)
 	private String name;
 	private String email;
+	@Getter(AccessLevel.NONE)
 	private String password;
 	private String about;
 	
@@ -68,6 +70,7 @@ public class User implements UserDetails{
 		return this.email;
 	}
 	
+	
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
@@ -87,6 +90,11 @@ public class User implements UserDetails{
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+
+	@Override
+	public String getPassword() {
+		return this.password;
 	}
 
 }

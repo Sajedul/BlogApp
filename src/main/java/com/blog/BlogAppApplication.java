@@ -33,7 +33,7 @@ public class BlogAppApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		//System.out.println(this.passwordEncoder.encode("12345"));
+		System.out.println(this.passwordEncoder.encode("12345"));
 		
 		try {
 			Role role= new Role();
@@ -42,7 +42,7 @@ public class BlogAppApplication implements CommandLineRunner{
 			
 			Role role1= new Role();
 			role1.setId(AppConstants.NORMAl_USER);
-			role1.setName("ROLE_NORMAL");
+			role1.setName("ROLE_USER");
 			
 			List<Role>roles=List.of(role,role1);
 			

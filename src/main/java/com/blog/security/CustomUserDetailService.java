@@ -1,5 +1,7 @@
 package com.blog.security;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,14 +18,21 @@ public class CustomUserDetailService implements UserDetailsService{
 
 	@Autowired
 	private UserRepo userRepo;
+	
 	@Override
-	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) throws EmailResourceNotFoundException {
 		
 		//load user from database by email as userName
-		User user= this.userRepo.findByEmail(userName).orElseThrow(()->new EmailResourceNotFoundException("User", "user email", userName));
+//		User user= this.userRepo.findByEmail(username).orElseThrow(()->new EmailResourceNotFoundException("User", "user email", username));
+//		
+//		
+//		return user;
 		
-		
-		return user;
+		User user= this.userRepo.findByEmail(username).orElseThrow(()->new EmailResourceNotFoundException("User", "user email", username));
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), new ArrayList<>());
 	}
 	
 	
